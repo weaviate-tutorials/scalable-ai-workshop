@@ -5,7 +5,7 @@ image:
   pullPolicy: IfNotPresent
   pullSecrets: []
 
-replicas: 6
+replicas: 1
 updateStrategy:
   type: RollingUpdate
 resources:
