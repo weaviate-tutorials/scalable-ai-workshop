@@ -1,8 +1,7 @@
-# Scalable-rag-ODSC-eu-2024
+# Scalable AI applications with Weaviate
 
-README for ODSC Europe training: "How to run scalable, fault-tolerant RAG with a vector database"
-
-> Note: This project was archived after ODSC Europe 2024 and is no longer maintained. Thank you for your interest! Please see the official [Weaviate documentation](https://weaviate.io/developers/weaviate) for the latest information on Weaviate.
+> [!NOTE]
+> Please see the official [Weaviate documentation](https://weaviate.io/developers/weaviate) for the latest information on Weaviate.
 
 ![App screenshot](assets/app.png)
 
@@ -11,8 +10,8 @@ README for ODSC Europe training: "How to run scalable, fault-tolerant RAG with a
 Clone this repo and navigate into it. This will be your working directory for the workshop.
 
 ```shell
-git clone git@github.com:weaviate-tutorials/scalable-rag-ODSC-eu-2024.git
-cd scalable-rag-ODSC-eu-2024
+git clone git@github.com:weaviate-tutorials/scalable-ai-workshop.git
+cd scalable-ai-workshop
 ```
 
 ## 1.1 Install Python & set up a virtual environment

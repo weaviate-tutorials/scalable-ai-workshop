@@ -1,6 +1,6 @@
 image:
   registry: cr.weaviate.io
-  tag: 1.26.1
+  tag: 1.26.6
   repo: semitechnologies/weaviate
   pullPolicy: IfNotPresent
   pullSecrets: []
