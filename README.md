@@ -153,7 +153,7 @@ python workshop_setup.py --provider <YOUR_PROVIDER> --dataset-size 10000
 Install Docker Desktop: https://www.docker.com/products/docker-desktop/
 Docker will also be used as a container runtime for Minikube.
 
-### 1.3.2 Minikube & Helm (Recommended)
+### 1.3.2 Minikube & Helm (Optional, only if you want to use Kubernetes)
 
 For running Weaviate in a Kubernetes cluster, you can use Minikube & Helm.
 
@@ -169,14 +169,41 @@ Now, you are ready to start running Weaviate!
 
 # Part 2: Cluster setup
 
-This workshop is designed for you to use kubernetes. But you can also just use Docker. For Docker instructions, go straight to [section 2.2](#22-docker).
+> [!INFO]
+> For simplicity, we will use Docker in the online workshop.
+>
+> But for a setup closer to production, try the Kubernetes setup following [section 2.2](#22-minikube--helm) instead.
+
+## 2.1 Docker
+
+Start up a single-node Weaviate cluster with the following command:
+
+```shell
+docker-compose up -d
+```
+
+This will start a single-node Weaviate cluster.
+
+Check an Weaviate endpoint:
+
+```shell
+curl http://localhost:8080/v1/meta | jq
+```
+
+You should see a response - this means Weaviate is running!
+
+You should be able to see the memory usage of the Weaviate pod by running:
+
+```shell
+go tool pprof -top http://localhost:6060/debug/pprof/heap
+```
+
+## 2.2 Minikube & Helm
 
 > [!NOTE]
 > This is not an actual production setup. But, we can approximate a production set-up by using a local cluster and using Kubernetes to orchestrate our local cluster, just like we would a cluster in production.
 
-## 2.1 Minikube & Helm
-
-### 2.1.1 Set up the cluster
+### 2.2.1 Set up the cluster
 
 Update helm chart & add the Weaviate repository:
 
@@ -204,7 +231,7 @@ minikube config set memory 2048
 minikube start --nodes 1
 ```
 
-### 2.1.1 Install Weaviate onto our cluster
+### 2.2.2 Install Weaviate onto our cluster
 
 Install Weaviate:
 
@@ -265,55 +292,15 @@ You should be able to see the memory usage of the Weaviate pod by running:
 go tool pprof -top http://localhost:6060/debug/pprof/heap
 ```
 
+The Docker-based Weaviate is configured to run on port 8080, whereas the Kubernetes deployment uses port 80. Open `helpers.py` and update `port=8080` to `port=80` and restart the Streamlit app.
+
 Now, go to [Step 3](#step-3-work-with-weaviate)
-
-## 2.2 Docker
-
-If for whatever reason you can't use Minikube, you can follow this workshop by running Weaviate in Docker.
-
-Start up a single-node Weaviate cluster with the following command:
-
-```shell
-docker-compose up -d
-```
-
-This will start a single-node Weaviate cluster.
-
-Check an Weaviate endpoint:
-
-```shell
-curl http://localhost:8080/v1/meta | jq
-```
-
-You should see a response - this means Weaviate is running!
-
-The Docker-based Weaviate is configured to run on port 8080. Open `helpers.py` and update `port=80` to `port=8080` and restart the Streamlit app.
-
-You should be able to see the memory usage of the Weaviate pod by running:
-
-```shell
-go tool pprof -top http://localhost:6060/debug/pprof/heap
-```
-
-### 2.2.1 Why use Minikube?
-
-It might be tempting to skip the Kubernetes part of the workshop, and just use Docker. But, there are some benefits to using Minikube:
-
-- You can experiment with different configurations, such as different amounts of memory, or different numbers of nodes.
-- It more closely resembles a production environment, where you would likely use Kubernetes.
-- You can experiment with scaling out Weaviate, and see how it affects the memory usage.
-
-But, if you're short on time, or you're not interested in Kubernetes, you can just use the Docker setup. We think you'll still get a lot out of the workshop.
 
 # Step 3: Work with Weaviate
 
-## 3.0 Introductory workshop
-
-If you are new to Weaviate, you can take a look at the introductory materials. Take a look at the slide deck PDF, or the `intro_workshop.ipynb` notebook.
-
-In the in-person workshop, we will go through the introductory materials together. If you are doing this workshop on your own, you can go through the materials at your own pace.
-
-For complete examples, see `intro_workshop_finished.ipynb` notebook.
+> [!TIP]
+> If you are new to Weaviate, you can take a look at the introductory materials. Take a look at the slide deck PDF, or the `intro_workshop.ipynb` notebook.
+> For complete examples, see `intro_workshop_finished.ipynb` notebook.
 
 ## 3.1 Run the demo Streamlit app
 
@@ -364,41 +351,33 @@ We don't want to spoil the whole workshop for you, so we'll leave it here for no
 
 # Step 3.3
 
-*************************
-ENJOY THE WORKSHOP
-*************************
 
-We'll try lots of different things here & have a look at the memory profile of the Weaviate pod.
-
-*************************
-ENJOY THE WORKSHOP
-*************************
 
 # Step 4: Additional exercises to try
 
-## 4.1 Increase the pod memory (Kubernetes users only)
+## 4.1 Scale out Weaviate
 
-Increase its memory, e.g. to:
+### 4.1.1 Docker
 
-```yaml
-resources:
-  requests:
-    cpu: '500m'
-    memory: '1000Mi'
-  limits:
-    cpu: '1000m'
-    memory: '1000Mi'
-```
-
-Actually, we have a pre-configured values file for this. Run the following command to upgrade Weaviate with the new values:
+First, shut down the existing Docker-based Weaviate.
 
 ```shell
-helm upgrade --install "weaviate" weaviate/weaviate --namespace "weaviate" --values ./values-larger.yaml
+docker-compose down
 ```
 
-## 4.2 Scale out Weaviate
+Now, spin up a three-node Weaviate cluster:
 
-### 4.2.1 Kubernetes
+```shell
+docker-compose -f docker-compose-three-nodes.yml up -d
+```
+
+(Earlier, we were using the default `docker-compose.yml` file, so we did not need to specify it. Now, we need to specify the file with the `-f` flag.)
+
+Then, run the scripts to create the collection and add data.
+
+Note that this is a slightly different exercise to the Kubernetes-based one. The reason is that the Kubernetes pods were configured with an artificially small amount of RAM, to showcase the benefits of scaling up or out.
+
+### 4.1.2 Kubernetes
 
 To scale Weaviate out with Minikube, you need to do two things.
 
@@ -434,27 +413,7 @@ Then, run the scripts to create the collection and add data.
 
 How do the results change? Do you notice the same limitations?
 
-### 4.2.2 Docker
-
-First, shut down the existing Docker-based Weaviate.
-
-```shell
-docker-compose down
-```
-
-Now, spin up a three-node Weaviate cluster:
-
-```shell
-docker-compose -f docker-compose-three-nodes.yml up -d
-```
-
-(Earlier, we were using the default `docker-compose.yml` file, so we did not need to specify it. Now, we need to specify the file with the `-f` flag.)
-
-Then, run the scripts to create the collection and add data.
-
-Note that this is a slightly different exercise to the Kubernetes-based one. The reason is that the Kubernetes pods were configured with an artificially small amount of RAM, to showcase the benefits of scaling up or out.
-
-## 4.3 Update the vector index & quantization settings (Any deployment)
+## 4.2 Update the vector index & quantization settings (Any deployment)
 
 In `1_create_collection.py`, you can change the settings for the vector index and quantization.
 
@@ -463,7 +422,7 @@ Notice the commented out lines for `quantization`. Try each one, and see how it 
 Try changing `.hnsw` to `.flat`. How does this affect the memory usage and the search performance of the system?
 - Note: The `.flat` index can only be used with the `bq` quantization.
 
-## 4.4 Try a larger dataset (Any deployment)
+## 4.3 Try a larger dataset (Any deployment)
 
 If you want to experiment with even larger (or smaller) datasets, you can run the following command:
 
@@ -474,6 +433,26 @@ python workshop_setup.py --provider <YOUR_PROVIDER> --dataset-size <SIZE>
 Where `<SIZE>` is one of `10000`, `50000` (default), `100000` or `200000`.
 
 They are pre-vectorized datasets, so you can experiment with different sizes without having to wait for the data to be vectorized, or spend money on the inference.
+
+## 4.4 Increase the pod memory (Kubernetes users only)
+
+Increase its memory, e.g. to:
+
+```yaml
+resources:
+  requests:
+    cpu: '500m'
+    memory: '1000Mi'
+  limits:
+    cpu: '1000m'
+    memory: '1000Mi'
+```
+
+Actually, we have a pre-configured values file for this. Run the following command to upgrade Weaviate with the new values:
+
+```shell
+helm upgrade --install "weaviate" weaviate/weaviate --namespace "weaviate" --values ./values-larger.yaml
+```
 
 ## Finish up
 
