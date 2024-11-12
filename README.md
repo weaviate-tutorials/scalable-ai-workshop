@@ -179,7 +179,7 @@ Now, you are ready to start running Weaviate!
 Start up a single-node Weaviate cluster with the following command:
 
 ```shell
-docker-compose up -d
+docker compose up -d
 ```
 
 This will start a single-node Weaviate cluster.
@@ -362,13 +362,13 @@ We don't want to spoil the whole workshop for you, so we'll leave it here for no
 First, shut down the existing Docker-based Weaviate.
 
 ```shell
-docker-compose down
+docker compose down
 ```
 
 Now, spin up a three-node Weaviate cluster:
 
 ```shell
-docker-compose -f docker-compose-three-nodes.yml up -d
+docker compose -f docker-compose-three-nodes.yml up -d
 ```
 
 (Earlier, we were using the default `docker-compose.yml` file, so we did not need to specify it. Now, we need to specify the file with the `-f` flag.)
@@ -469,7 +469,7 @@ minikube stop
 When finished with the workshop, you can stop the cluster with:
 
 ```shell
-docker-compose -f docker-compose.yml down
+docker compose -f docker-compose.yml down
 ```
 
 Or
@@ -477,5 +477,5 @@ Or
 And a three-node cluster with:
 
 ```shell
-docker-compose -f docker-compose-three-nodes.yml down
+docker compose -f docker-compose-three-nodes.yml down
 ```
