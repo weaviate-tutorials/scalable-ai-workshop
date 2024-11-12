@@ -8,7 +8,6 @@ import numpy as np
 def import_from_hdf5(file_path: str):
     # Connect to Weaviate
 
-    counter = 0
     with connect_to_weaviate() as client:
 
         collection = client.collections.get(CollectionName.SUPPORTCHAT)

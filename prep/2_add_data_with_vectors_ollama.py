@@ -9,7 +9,6 @@ from random import randint
 def import_from_hdf5(file_path: str):
     # Connect to Weaviate
 
-    counter = 0
     with connect_to_weaviate() as client:
 
         collection = client.collections.get(CollectionName.SUPPORTCHAT)
@@ -54,11 +53,8 @@ def import_from_hdf5(file_path: str):
                         uuid=uuid,
                         properties=properties,
                         vector={"text_with_metadata": vectors["text_with_metadata"]},
-                        tenant=tenant if use_multi_tenancy else None,
+                        tenant=tenant,
                     )
-                    counter += 1
-                    if counter >= max_objects:
-                        break
 
     print(f"Import completed. {total_objects} objects imported.")
     if len(client.batch.failed_objects) > 0:
