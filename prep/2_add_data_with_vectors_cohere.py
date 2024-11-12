@@ -5,10 +5,11 @@ from tqdm import tqdm
 import numpy as np
 
 
-def import_from_hdf5(file_path: str):
+def import_from_hdf5(file_path: str, use_multi_tenancy: bool = True):
     # Connect to Weaviate
+
+    counter = 0
     with connect_to_weaviate() as client:
-        chats = client.collections.get(CollectionName.SUPPORTCHAT)
 
         # Open the HDF5 file
         with h5py.File(file_path, "r") as hf:
@@ -16,7 +17,7 @@ def import_from_hdf5(file_path: str):
             total_objects = len(hf.keys())
 
             # Use batch import for efficiency
-            with chats.batch.fixed_size(batch_size=200) as batch:
+            with client.batch.fixed_size(batch_size=200) as batch:
                 for uuid in tqdm(
                     hf.keys(), total=total_objects, desc="Importing objects"
                 ):
@@ -32,15 +33,26 @@ def import_from_hdf5(file_path: str):
                             vector_name = key.split("_", 1)[1]
                             vectors[vector_name] = np.asarray(group[key])
 
+                    if use_multi_tenancy:
+                        tenant = f"tenant_{len(properties['company_author']) % 5}"
+                    else:
+                        tenant = None
+
                     # Add the object to the batch
-                    batch.add_object(uuid=uuid, properties=properties, vector=vectors)
+                    batch.add_object(
+                        collection=CollectionName.SUPPORTCHAT,
+                        uuid=uuid,
+                        properties=properties,
+                        vector={"text_with_metadata": vectors["text_with_metadata"]},
+                        tenant=tenant
+                    )
 
     print(f"Import completed. {total_objects} objects imported.")
-    if len(chats.batch.failed_objects) > 0:
+    if len(client.batch.failed_objects) > 0:
         print("*" * 80)
-        print(f"***** Failed to add {len(chats.batch.failed_objects)} objects *****")
+        print(f"***** Failed to add {len(client.batch.failed_objects)} objects *****")
         print("*" * 80)
-        print(chats.batch.failed_objects[:3])
+        print(client.batch.failed_objects[:3])
 
 
 if __name__ == "__main__":

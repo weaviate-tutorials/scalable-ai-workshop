@@ -29,12 +29,6 @@ chunks = client.collections.create(
     # ================================================================================
     vectorizer_config=[
         Configure.NamedVectors.text2vec_cohere(
-            name="text",
-            source_properties=["text"],
-            vector_index_config=default_vindex_config,
-            model="embed-multilingual-light-v3.0",
-        ),
-        Configure.NamedVectors.text2vec_cohere(
             name="text_with_metadata",
             source_properties=["text", "company_author"],
             vector_index_config=default_vindex_config,
@@ -49,12 +43,6 @@ chunks = client.collections.create(
     # # Set up the collection to use OpenAI
     # # ================================================================================
     # vectorizer_config=[
-    #     Configure.NamedVectors.text2vec_openai(
-    #         name="text",
-    #         source_properties=["text"],
-    #         vector_index_config=default_vindex_config,
-    #         model="text-embedding-3-small",
-    #     ),
     #     Configure.NamedVectors.text2vec_openai(
     #         name="text_with_metadata",
     #         source_properties=["text", "company_author"],
@@ -72,13 +60,6 @@ chunks = client.collections.create(
     # # Alternative: Set up the collection to use local models with Ollama
     # # ================================================================================
     # vectorizer_config=[
-    #     Configure.NamedVectors.text2vec_ollama(
-    #         name="text",
-    #         source_properties=["text"],
-    #         vector_index_config=default_vindex_config,
-    #         api_endpoint="http://host.docker.internal:11434",
-    #         model="nomic-embed-text",
-    #     ),
     #     Configure.NamedVectors.text2vec_ollama(
     #         name="text_with_metadata",
     #         source_properties=["text", "company_author"],

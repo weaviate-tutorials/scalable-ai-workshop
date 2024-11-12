@@ -36,7 +36,15 @@ with connect_to_weaviate() as client:
     with col1:
         st.markdown("### Customer support analysis")
 
-        top_companies = get_top_companies(collection)
+        if mt_enabled:
+            tenants = sorted(collection.tenants.get().keys())
+            tenant = st.selectbox("Select tenant", tenants)
+
+            collection_tenant = collection.with_tenant(tenant)
+        else:
+            collection_tenant = collection
+
+        top_companies = get_top_companies(collection_tenant)
         if len(top_companies) > 0:
             top_companies_str = ", ".join(
                 [f"**{company.value}** ({company.count})" for company in top_companies]
@@ -70,7 +78,7 @@ with connect_to_weaviate() as client:
         st.markdown("#### Results")
 
         search_response = weaviate_query(
-            collection, query, company_filter, limit, search_type
+            collection_tenant, query, company_filter, limit, search_type
         )
 
         st.markdown(f"For query: `{query}`")
@@ -96,7 +104,7 @@ with connect_to_weaviate() as client:
             if st.button("Generate response"):
                 with st.spinner("Generating response..."):
                     search_response = weaviate_query(
-                        collection, query, company_filter, limit, search_type, rag_query
+                        collection_tenant, query, company_filter, limit, search_type, rag_query
                     )
 
                     if search_response:
