@@ -79,6 +79,6 @@ typing_extensions==4.12.2
 tzdata==2024.1
 urllib3==2.2.2
 validators==0.34.0
-weaviate-client==4.8.1
+weaviate-client==4.9.3
 xxhash==3.5.0
 yarl==1.9.4
