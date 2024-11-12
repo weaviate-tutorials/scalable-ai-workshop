@@ -45,52 +45,14 @@ chunks = client.collections.create(
     # ================================================================================
     # END: OpenAI configuration
     # ================================================================================
-    # # ================================================================================
-    # # Alternative: Set up the collection to use local models with Ollama
-    # # ================================================================================
-    # vectorizer_config=[
-    #     Configure.NamedVectors.text2vec_ollama(
-    #         name="text",
-    #         source_properties=["text"],
-    #         vector_index_config=default_vindex_config,
-    #         api_endpoint="http://host.docker.internal:11434",
-    #         model="nomic-embed-text",
-    #     ),
-    #     Configure.NamedVectors.text2vec_ollama(
-    #         name="text_with_metadata",
-    #         source_properties=["text", "company_author"],
-    #         vector_index_config=default_vindex_config,
-    #         api_endpoint="http://host.docker.internal:11434",
-    #         model="nomic-embed-text",
-    #     ),
-    # ],
-    # generative_config=Configure.Generative.ollama(
-    #     api_endpoint="http://host.docker.internal:11434", model="gemma2:2b"
-    # ),
-    # # ================================================================================
-    # # END: Ollama configuration
-    # # ================================================================================
-    # # ================================================================================
-    # # Alternative: Set up the collection to use Cohere
-    # # ================================================================================
-    # vectorizer_config=[
-    #     Configure.NamedVectors.text2vec_cohere(
-    #         name="text",
-    #         source_properties=["text"],
-    #         vector_index_config=default_vindex_config,
-    #         model="embed-multilingual-light-v3.0",
-    #     ),
-    #     Configure.NamedVectors.text2vec_cohere(
-    #         name="text_with_metadata",
-    #         source_properties=["text", "company_author"],
-    #         vector_index_config=default_vindex_config,
-    #         model="embed-multilingual-light-v3.0",
-    #     ),
-    # ],
-    # generative_config=Configure.Generative.cohere(model="command-r"),
-    # # ================================================================================
-    # # END: Cohere configuration
-    # # ================================================================================
+    #
+    # ================================================================================
+    # Uncomment this section to enable multi-tenancy
+    # ================================================================================
+    multi_tenancy_config=Configure.multi_tenancy(
+        enabled=True,
+        auto_tenant_creation=True,
+    ),
 )
 
 assert client.collections.exists(CollectionName.SUPPORTCHAT)

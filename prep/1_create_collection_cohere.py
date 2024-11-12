@@ -39,41 +39,14 @@ chunks = client.collections.create(
     # ================================================================================
     # END: Cohere configuration
     # ================================================================================
-    # # ================================================================================
-    # # Set up the collection to use OpenAI
-    # # ================================================================================
-    # vectorizer_config=[
-    #     Configure.NamedVectors.text2vec_openai(
-    #         name="text_with_metadata",
-    #         source_properties=["text", "company_author"],
-    #         vector_index_config=default_vindex_config,
-    #         model="text-embedding-3-small",
-    #     ),
-    # ],
-    # generative_config=Configure.Generative.openai(
-    #     model="gpt-3.5-turbo-16k"
-    # ),
-    # # ================================================================================
-    # # END: OpenAI configuration
-    # # ================================================================================
-    # # ================================================================================
-    # # Alternative: Set up the collection to use local models with Ollama
-    # # ================================================================================
-    # vectorizer_config=[
-    #     Configure.NamedVectors.text2vec_ollama(
-    #         name="text_with_metadata",
-    #         source_properties=["text", "company_author"],
-    #         vector_index_config=default_vindex_config,
-    #         api_endpoint="http://host.docker.internal:11434",
-    #         model="nomic-embed-text",
-    #     ),
-    # ],
-    # generative_config=Configure.Generative.ollama(
-    #     api_endpoint="http://host.docker.internal:11434", model="gemma2:2b"
-    # ),
-    # # ================================================================================
-    # # END: Ollama configuration
-    # # ================================================================================
+    #
+    # ================================================================================
+    # Uncomment this section to enable multi-tenancy
+    # ================================================================================
+    multi_tenancy_config=Configure.multi_tenancy(
+        enabled=True,
+        auto_tenant_creation=True,
+    ),
 )
 
 assert client.collections.exists(CollectionName.SUPPORTCHAT)

@@ -6,11 +6,18 @@ import numpy as np
 from random import randint
 
 
-def import_from_hdf5(file_path: str, use_multi_tenancy: bool = True, max_objects: int = 50000):
+def import_from_hdf5(file_path: str):
     # Connect to Weaviate
 
     counter = 0
     with connect_to_weaviate() as client:
+
+        collection = client.collections.get(CollectionName.SUPPORTCHAT)
+
+        if collection.config.get().multi_tenancy_config.enabled:
+            use_multi_tenancy = True
+        else:
+            use_multi_tenancy = False
 
         # Open the HDF5 file
         with h5py.File(file_path, "r") as hf:
@@ -35,6 +42,7 @@ def import_from_hdf5(file_path: str, use_multi_tenancy: bool = True, max_objects
                             vector_name = key.split("_", 1)[1]
                             vectors[vector_name] = np.asarray(group[key])
 
+                    # If using multi-tenancy, assign a tenant (arbitrarily based on the company author length)
                     if use_multi_tenancy:
                         tenant = f"tenant_{len(properties['company_author']) % 5}"
                     else:
