@@ -343,15 +343,13 @@ You should see the memory profile of the Weaviate pod increase as the data is ad
 
 Now, refresh the Streamlit app. You should see the data in the app. Explore the app, and see what types of results you get for different search queries.
 
-How did it go? Did you get the results you expected?
+# Step 3.3
 
-You might see that the import didn't quite finish. This is because the Weaviate pod doesn't have enough memory to handle the data. There are a few different things we can do...
+Here, we'll try things like change the index types, quantization schemes, and talk about multi-tenancy.
 
 We don't want to spoil the whole workshop for you, so we'll leave it here for now. But - if you find yourself ahead of the group, you can try playing with the following sections and ideas:
 
-# Step 3.3
-
-
+ENJOY THE WORKSHOP!
 
 # Step 4: Additional exercises to try
 
