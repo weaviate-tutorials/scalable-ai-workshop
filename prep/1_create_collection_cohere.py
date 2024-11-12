@@ -9,6 +9,7 @@ client = connect_to_weaviate()  # Uses `weaviate.connect_to_local` under the hoo
 # Delete existing collection if it exists
 client.collections.delete(CollectionName.SUPPORTCHAT)
 
+# Try different vector index configurations and see how they affect the speed, memory usage & recall
 default_vindex_config = Configure.VectorIndex.hnsw(
     # quantizer=Configure.VectorIndex.Quantizer.bq()
     # quantizer=Configure.VectorIndex.Quantizer.sq(training_limit=25000)
