@@ -10,6 +10,8 @@ import claudette
 from anthropic.types import Message
 import ollama
 import subprocess
+import json
+from collections import Counter
 import weaviate
 from weaviate import WeaviateClient
 from weaviate.collections import Collection
@@ -60,13 +62,33 @@ def get_data_objects(
         }
 
 
-def get_top_companies(collection: Collection):
-    response = collection.aggregate.over_all(
-        return_metrics=Metrics("company_author").text(
-            top_occurrences_count=True, top_occurrences_value=True, count=True
-        )
-    )
-    return response.properties["company_author"].top_occurrences
+def get_top_companies(collection: Collection, top_n: int, get_counts: bool = True) -> List[tuple[str, int]]:
+
+    if os.path.exists("top_companies.json"):
+        with open("top_companies.json") as f:
+            top_companies = json.load(f)
+    else:
+        response = collection.query.fetch_objects(limit=2000)
+        companies = [str(c.properties["company_author"]) for c in response.objects if c.properties["company_author"] != ""]
+        top_companies = Counter(companies).most_common(15)
+        with open("top_companies.json", "w") as f:
+            json.dump(top_companies, f)
+
+    top_companies = top_companies[:top_n]
+
+    actual_company_counts = dict()
+
+    if get_counts:
+        for company, _ in top_companies:
+            count = collection.aggregate.over_all(
+                filters=Filter.by_property("company_author").equal(company),
+                total_count=True,
+            )
+            actual_company_counts[company] = count.total_count
+    else:
+        actual_company_counts = top_companies
+
+    return actual_company_counts
 
 
 def weaviate_query(
@@ -78,7 +100,7 @@ def weaviate_query(
     rag_query: Optional[str] = None,
 ):
     if company_filter:
-        company_filter_obj = Filter.by_property("company_author").like(company_filter)
+        company_filter_obj = Filter.by_property("company_author").equal(company_filter)
     else:
         company_filter_obj = None
 
@@ -88,7 +110,6 @@ def weaviate_query(
         alpha = 1
     elif search_type == "Keyword":
         alpha = 0
-
 
     if rag_query:
         search_response = collection.generate.hybrid(
