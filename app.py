@@ -68,9 +68,9 @@ with connect_to_weaviate() as client:
 
         # ===== Search and display results =====
 
-        with st.container(height=250):
-            st.markdown("**Results**")
+        st.markdown("**Results**")
 
+        with st.container(height=250):
             search_response = weaviate_query(
                 collection_tenant, query, company_filter, limit, search_type
             )
@@ -91,22 +91,21 @@ with connect_to_weaviate() as client:
         # API key will be read from the environment variable ANTHROPIC_API_KEY
 
         if len(search_response.objects) > 0:
-            with st.container(height=250):
-                st.markdown("**RAG**")
+            st.markdown("**RAG**")
 
-                rag_query = st.text_area(
-                    label="What should we do with the search results?",
-                )
+            rag_query = st.text_area(
+                label="What should we do with the search results?",
+            )
 
-                if st.button("Generate response"):
-                    with st.spinner("Generating response..."):
-                        search_response = weaviate_query(
-                            collection_tenant, query, company_filter, limit, search_type, rag_query
-                        )
+            if st.button("Generate response"):
+                with st.spinner("Generating response..."):
+                    search_response = weaviate_query(
+                        collection_tenant, query, company_filter, limit, search_type, rag_query
+                    )
 
-                        if search_response:
-                            with st.container(height=250, border=True):
-                                st.write(search_response.generated)
+                    if search_response:
+                        with st.container(height=250, border=True):
+                            st.write(search_response.generated)
 
     with col2:
         if len(top_companies) > 0:
