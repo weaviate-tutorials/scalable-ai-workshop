@@ -26,9 +26,9 @@ frozenlist==1.4.1
 fsspec==2024.6.1
 gitdb==4.0.11
 GitPython==3.1.43
-grpcio==1.66.0
-grpcio-health-checking==1.66.0
-grpcio-tools==1.66.0
+grpcio==1.68.1
+grpcio-health-checking==1.68.1
+grpcio-tools==1.68.1
 h11==0.14.0
 h5py==3.11.0
 httpcore==1.0.5
@@ -51,7 +51,7 @@ packaging==24.1
 pandas==2.2.2
 pillow==10.4.0
 plotly==5.23.0
-protobuf==5.27.3
+protobuf==5.29.1
 pyarrow==17.0.0
 pycparser==2.22
 pydantic==2.8.2
@@ -79,6 +79,6 @@ typing_extensions==4.12.2
 tzdata==2024.1
 urllib3==2.2.2
 validators==0.34.0
-weaviate-client==4.9.3
+weaviate-client==4.10.2
 xxhash==3.5.0
 yarl==1.9.4

@@ -198,6 +198,8 @@ You should be able to see the memory usage of the Weaviate pod by running:
 go tool pprof -top http://localhost:6060/debug/pprof/heap
 ```
 
+Now, go to [Step 3](#step-3-work-with-weaviate)
+
 ## 2.2 Minikube & Helm
 
 > [!NOTE]
