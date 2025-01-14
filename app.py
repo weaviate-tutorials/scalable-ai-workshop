@@ -40,10 +40,10 @@ with connect_to_weaviate() as client:
             tenant = st.selectbox("Select tenant", tenants)
 
             collection_tenant = collection.with_tenant(tenant)
+            top_companies = get_top_companies(collection_tenant, 10, recalculate_stats=True, save_outputs=False)
         else:
             collection_tenant = collection
-
-        top_companies = get_top_companies(collection_tenant, 10)
+            top_companies = get_top_companies(collection_tenant, 10)
 
         # ===== Search inputs =====
 

@@ -62,15 +62,17 @@ def get_data_objects(
         }
 
 
-def get_top_companies(collection: Collection, top_n: int, get_counts: bool = True) -> List[tuple[str, int]]:
+def get_top_companies(collection: Collection, top_n: int, get_counts: bool = True, recalculate_stats = True, save_outputs = True) -> List[tuple[str, int]]:
 
-    if os.path.exists("top_companies.json"):
+    if os.path.exists("top_companies.json") and not recalculate_stats:
         with open("top_companies.json") as f:
             top_companies = json.load(f)
     else:
-        response = collection.query.fetch_objects(limit=2000)
+        response = collection.query.fetch_objects(limit=200)
         companies = [str(c.properties["company_author"]) for c in response.objects if c.properties["company_author"] != ""]
         top_companies = Counter(companies).most_common(15)
+
+    if save_outputs:
         with open("top_companies.json", "w") as f:
             json.dump(top_companies, f)
 
