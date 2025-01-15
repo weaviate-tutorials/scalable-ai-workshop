@@ -3,7 +3,9 @@ import h5py
 import json
 from tqdm import tqdm
 import numpy as np
-from random import randint
+
+
+tenant_names = ["AcmeCo", "Globex", "Initech", "UmbrellaCorp", "WayneEnterprises"]
 
 
 def import_from_hdf5(file_path: str):
@@ -28,7 +30,6 @@ def import_from_hdf5(file_path: str):
                 for uuid in tqdm(
                     hf.keys(), total=total_objects, desc="Importing objects"
                 ):
-                    tenant = f"tenant_{randint(0, 20)}" if use_multi_tenancy else None
                     group = hf[uuid]
 
                     # Get the object properties
@@ -43,7 +44,8 @@ def import_from_hdf5(file_path: str):
 
                     # If using multi-tenancy, assign a tenant (arbitrarily based on the company author length)
                     if use_multi_tenancy:
-                        tenant = f"tenant_{len(properties['company_author']) % 5}"
+                        tenant_index = len(properties['company_author']) % 5
+                        tenant = tenant_names[tenant_index]
                     else:
                         tenant = None
 

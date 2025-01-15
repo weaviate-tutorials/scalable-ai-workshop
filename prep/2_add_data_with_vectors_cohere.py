@@ -5,6 +5,9 @@ from tqdm import tqdm
 import numpy as np
 
 
+tenant_names = ["AcmeCo", "Globex", "Initech", "UmbrellaCorp", "WayneEnterprises"]
+
+
 def import_from_hdf5(file_path: str):
     # Connect to Weaviate
 
@@ -41,7 +44,8 @@ def import_from_hdf5(file_path: str):
 
                     # If using multi-tenancy, assign a tenant (arbitrarily based on the company author length)
                     if use_multi_tenancy:
-                        tenant = f"tenant_{len(properties['company_author']) % 5}"
+                        tenant_index = len(properties['company_author']) % 5
+                        tenant = tenant_names[tenant_index]
                     else:
                         tenant = None
 

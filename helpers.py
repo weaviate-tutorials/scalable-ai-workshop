@@ -4,18 +4,15 @@ from enum import Enum
 from datasets import load_dataset
 from datetime import datetime
 from dateutil import parser
-from typing import Dict, Union, List, Any, Literal, Optional
+from typing import Dict, Union, List, Literal, Optional
 from collections.abc import Iterator
-import claudette
-from anthropic.types import Message
-import ollama
 import subprocess
 import json
 from collections import Counter
 import weaviate
 from weaviate import WeaviateClient
 from weaviate.collections import Collection
-from weaviate.classes.query import Metrics, Filter
+from weaviate.classes.query import Filter
 import os
 
 
@@ -101,7 +98,7 @@ def weaviate_query(
     search_type: Literal["Hybrid", "Vector", "Keyword"],
     rag_query: Optional[str] = None,
 ):
-    if company_filter:
+    if company_filter and company_filter != "Any":
         company_filter_obj = Filter.by_property("company_author").equal(company_filter)
     else:
         company_filter_obj = None
@@ -140,34 +137,6 @@ def get_pprof_results() -> str:
         text=True,
         timeout=10,
     )
-
-
-def manual_rag(
-    rag_query: str, context: str, provider: Literal["claude", "ollama"]
-) -> List[str]:
-    prompt = f"""
-    Answer this query <query>{rag_query}</query>
-    about these conversations between
-    customer support people and customers: {context}
-    """
-    if provider == "claude":
-        chat = claudette.Chat(
-            model="claude-3-haiku-20240307"  # e.g. "claude-3-haiku-20240307" or "claude-3-5-sonnet-20240620"
-        )
-        r: Message = chat(prompt)
-        rag_responses = [c.text for c in r.content]
-        return rag_responses
-    elif provider == "ollama":
-        response = ollama.chat(
-            model="gemma2b:2b",
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                },
-            ],
-        )
-        return [(response["message"]["content"])]
 
 
 STREAMLIT_STYLING = """

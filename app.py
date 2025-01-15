@@ -57,7 +57,7 @@ with connect_to_weaviate() as client:
 
         with input_c2:
             company_filter = st.selectbox(
-                label="Select the company account", options=list(top_companies.keys()), index=0
+                label="Select account", options=["Any"] + list(top_companies.keys()), index=0
             )
             search_type = st.radio(
                 label="Search type",

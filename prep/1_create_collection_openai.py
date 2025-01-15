@@ -50,10 +50,10 @@ chunks = client.collections.create(
     # ================================================================================
     # Uncomment this section to enable multi-tenancy
     # ================================================================================
-    multi_tenancy_config=Configure.multi_tenancy(
-        enabled=True,
-        auto_tenant_creation=True,
-    ),
+    # multi_tenancy_config=Configure.multi_tenancy(
+    #     enabled=True,
+    #     auto_tenant_creation=True,
+    # ),
 )
 
 assert client.collections.exists(CollectionName.SUPPORTCHAT)
