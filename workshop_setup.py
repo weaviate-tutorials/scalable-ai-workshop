@@ -82,7 +82,6 @@ def toggle_provider_config(file_path, selected_provider):
     modified_lines = []
     in_provider_section = False
     current_provider = None
-    comment_block = False
 
     for line in lines:
         # Detect provider section starts
@@ -95,15 +94,13 @@ def toggle_provider_config(file_path, selected_provider):
             if current_provider.lower() == selected_provider:
                 # Selected provider: ensure lines are uncommented
                 if line.strip().startswith('# ') and not any(marker in line for marker in ['# Ollama', '# OpenAI', '# Cohere', '# END_Provider']):
-                    line = line[2:]  # Remove comment
+                    line = "    " + line[6:]  # Remove comment
                 modified_lines.append(line)
-                comment_block = False
             else:
                 # Other providers: ensure lines are commented
                 if not line.strip().startswith('#'):
-                    line = '# ' + line
+                    line = '    # ' + line[4:]
                 modified_lines.append(line)
-                comment_block = True
 
             # Check for end of provider section
             if "# END_Provider" in line:
