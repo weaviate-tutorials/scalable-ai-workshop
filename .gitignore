@@ -1,7 +1,5 @@
 data
 export
-1_create_collection.py
-2_add_data_with_vectors.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

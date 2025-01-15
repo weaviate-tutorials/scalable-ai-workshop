@@ -1,17 +1,17 @@
 import os
 import click
 import requests
+import shutil
 from pathlib import Path
 from tqdm import tqdm
-import shutil
 
 
 @click.command()
 @click.option("--provider", default="ollama", help="Which model provider to use.")
 @click.option("--dataset-size", default="50000", help="Size of the dataset to use.")
 @click.option("--use-cache", is_flag=True, default=True, help="Use cached files if available.")
-def download(provider, dataset_size, use_cache):
-    """Download prerequisite files & confirm required aspects."""
+def setup(provider, dataset_size, use_cache):
+    """Set up collection with the specified provider configuration."""
     available_dataset_sizes = ["10000", "50000", "100000", "200000"]
     available_providers = ["ollama", "openai", "cohere"]
 
@@ -25,83 +25,124 @@ def download(provider, dataset_size, use_cache):
         print(f"Please choose from {available_providers}")
         return
 
-    # Create `data` directory if it does not exist
+    # Download dataset
+    download_dataset(provider, dataset_size, use_cache)
+
+    # Update configurations in both files
+    update_configurations(provider)
+
+
+def download_dataset(provider, dataset_size, use_cache):
+    """Download the dataset for the specified provider."""
     data_dir = Path("data")
     data_dir.mkdir(exist_ok=True)
 
-    if provider == "ollama":
-        # Download file
-        dl_filename = f"twitter_customer_support_nomic_{dataset_size}.h5"
-        out_filename = f"twitter_customer_support_nomic.h5"
+    url_suffixes = {
+        "ollama": "nomic",
+        "openai": "openai-text-embedding-3-small",
+        "cohere": "cohere-embed-multilingual-light-v3.0"
+    }
 
-        if (data_dir / dl_filename).exists() and use_cache:
-            print(f"Using cached file {dl_filename}...")
-        else:
-            if use_cache:
-                print(f"No cached file {dl_filename} found.")
-            url = f"https://weaviate-workshops.s3.eu-west-2.amazonaws.com/odsc-europe-2024/twitter_customer_support_weaviate_export_{dataset_size}_nomic.h5"
-            download_file(url, data_dir / dl_filename)
+    provider_suffixes = {
+        "ollama": "nomic",
+        "openai": "openai",
+        "cohere": "cohere"
+    }
 
-        # Run Ollama commands
-        print("Running 'ollama pull nomic-embed-text'...")
-        os.system("ollama pull nomic-embed-text")
+    dl_filename = f"twitter_customer_support_{provider_suffixes[provider]}_{dataset_size}.h5"
+    out_filename = "twitter_customer_support.h5"
 
-        print("Running 'ollama pull gemma2:2b'...")
-        os.system("ollama pull gemma2:2b")
-
-    elif provider == "openai":
-        # Download file
-        dl_filename = f"twitter_customer_support_openai_{dataset_size}.h5"
-        out_filename = f"twitter_customer_support_openai.h5"
-
-        if (data_dir / dl_filename).exists() and use_cache:
-            print(f"Using cached file {dl_filename}...")
-        else:
-            if use_cache:
-                print(f"No cached file {dl_filename} found.")
-            url = f"https://weaviate-workshops.s3.eu-west-2.amazonaws.com/odsc-europe-2024/twitter_customer_support_weaviate_export_{dataset_size}_openai-text-embedding-3-small.h5"
-            download_file(url, data_dir / dl_filename)
-
-        # Check for OPENAI_API_KEY
-        if not os.environ.get("OPENAI_API_KEY"):
-            print("Warning: OPENAI_API_KEY is not set in the environment variables.")
-        else:
-            print("OPENAI_API_KEY is set.")
-
-    elif provider == "cohere":
-        # Download file
-        dl_filename = f"twitter_customer_support_cohere_{dataset_size}.h5"
-        out_filename = f"twitter_customer_support_cohere.h5"
-
-        if (data_dir / dl_filename).exists() and use_cache:
-            print(f"Using cached file {dl_filename}...")
-        else:
-            if use_cache:
-                print(f"No cached file {dl_filename} found.")
-            url = f"https://weaviate-workshops.s3.eu-west-2.amazonaws.com/odsc-europe-2024/twitter_customer_support_weaviate_export_{dataset_size}_cohere-embed-multilingual-light-v3.0.h5"
-            download_file(url, data_dir / dl_filename)
-
-        # Check for COHERE_API_KEY
-        if not os.environ.get("COHERE_API_KEY"):
-            print("Warning: COHERE_API_KEY is not set in the environment variables.")
-        else:
-            print("COHERE_API_KEY is set.")
-
+    if (data_dir / dl_filename).exists() and use_cache:
+        print(f"Using cached file {dl_filename}...")
     else:
-        print(f"Sorry, the provider value '{provider}' is not supported.")
+        if use_cache:
+            print(f"No cached file {dl_filename} found.")
+        url = f"https://weaviate-workshops.s3.eu-west-2.amazonaws.com/odsc-europe-2024/twitter_customer_support_weaviate_export_{dataset_size}_{url_suffixes[provider]}.h5"
+        download_file(url, data_dir / dl_filename)
 
-    shutil.copy(data_dir / dl_filename, data_dir / out_filename)
+    # Copy to standardized filename
+    if dl_filename != out_filename:
+        shutil.copy(data_dir / dl_filename, data_dir / out_filename)
 
-    # Copy appropriate configuration file
-    for src_config, dest_config in [
-        (f"prep/1_create_collection_{provider}.py", "1_create_collection.py"),
-        (f"prep/2_add_data_with_vectors_{provider}.py", "2_add_data_with_vectors.py"),
-    ]:
-        shutil.copy(src_config, dest_config)
-        print(f"Copied {src_config} to {dest_config}")
+
+def update_configurations(selected_provider):
+    """Update configurations in both files for the selected provider."""
+    # Update the collection creation script
+    toggle_provider_config("1_create_collection.py", selected_provider)
+
+    # Update the import script's file path
+    update_import_file_path("2_add_data_with_vectors.py")
+
+
+def toggle_provider_config(file_path, selected_provider):
+    """Toggle provider configurations in the collection creation file."""
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+
+    modified_lines = []
+    in_provider_section = False
+    current_provider = None
+    comment_block = False
+
+    for line in lines:
+        # Detect provider section starts
+        if "# Ollama" in line or "# OpenAI" in line or "# Cohere" in line:
+            current_provider = line.strip('# \n')
+            in_provider_section = True
+
+        # Handle the line based on context
+        if in_provider_section:
+            if current_provider.lower() == selected_provider:
+                # Selected provider: ensure lines are uncommented
+                if line.strip().startswith('# ') and not any(marker in line for marker in ['# Ollama', '# OpenAI', '# Cohere', '# END_Provider']):
+                    line = line[2:]  # Remove comment
+                modified_lines.append(line)
+                comment_block = False
+            else:
+                # Other providers: ensure lines are commented
+                if not line.strip().startswith('#'):
+                    line = '# ' + line
+                modified_lines.append(line)
+                comment_block = True
+
+            # Check for end of provider section
+            if "# END_Provider" in line:
+                in_provider_section = False
+                current_provider = None
+        else:
+            # Outside provider sections: keep line as is
+            modified_lines.append(line)
+
+    # Write the modified content back to the file
+    with open(file_path, 'w') as f:
+        f.writelines(modified_lines)
+
+    print(f"Updated {file_path} to use {selected_provider} configuration")
+
+
+def update_import_file_path(file_path):
+    """Update the import file path in the data import script."""
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+
+    modified_lines = []
+    for line in lines:
+        if 'import_from_hdf5("data/twitter_customer_support' in line:
+            # Use the standardized filename
+            new_line = '    import_from_hdf5("data/twitter_customer_support.h5")\n'
+            modified_lines.append(new_line)
+        else:
+            modified_lines.append(line)
+
+    # Write the modified content back to the file
+    with open(file_path, 'w') as f:
+        f.writelines(modified_lines)
+
+    print(f"Updated {file_path} with standardized file path")
 
 
 def download_file(url, filepath):
+    """Download a file with progress bar."""
     temp_filepath = filepath.with_suffix(".part")
 
     print(f"Downloading {url}...")
@@ -125,4 +166,4 @@ def download_file(url, filepath):
 
 
 if __name__ == "__main__":
-    download()
+    setup()

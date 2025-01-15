@@ -26,8 +26,40 @@ chunks = client.collections.create(
         Property(name="created_at", data_type=DataType.DATE),
     ],
     # ================================================================================
-    # Set up the collection to use Cohere
+    # Provider-specific configuration
     # ================================================================================
+    # Ollama
+    vectorizer_config=[
+        Configure.NamedVectors.text2vec_ollama(
+            name="text_with_metadata",
+            source_properties=["text", "company_author"],
+            vector_index_config=default_vindex_config,
+            api_endpoint="http://host.docker.internal:11434",
+            model="nomic-embed-text",
+        ),
+    ],
+    generative_config=Configure.Generative.ollama(
+        api_endpoint="http://host.docker.internal:11434", model="gemma2:2b"
+    ),
+    # END_Provider
+    # OpenAI
+    vectorizer_config=[
+        Configure.NamedVectors.text2vec_openai(
+            name="text",
+            source_properties=["text"],
+            vector_index_config=default_vindex_config,
+            model="text-embedding-3-small",
+        ),
+        Configure.NamedVectors.text2vec_openai(
+            name="text_with_metadata",
+            source_properties=["text", "company_author"],
+            vector_index_config=default_vindex_config,
+            model="text-embedding-3-small",
+        ),
+    ],
+    generative_config=Configure.Generative.openai(model="gpt-3.5-turbo-16k"),
+    # END_Provider
+    # Cohere
     vectorizer_config=[
         Configure.NamedVectors.text2vec_cohere(
             name="text_with_metadata",
@@ -37,9 +69,7 @@ chunks = client.collections.create(
         ),
     ],
     generative_config=Configure.Generative.cohere(model="command-r"),
-    # ================================================================================
-    # END: Cohere configuration
-    # ================================================================================
+    # END_Provider
     #
     # ================================================================================
     # Uncomment this section to enable multi-tenancy
