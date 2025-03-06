@@ -78,6 +78,10 @@ chunks = client.collections.create(
     #     enabled=True,
     #     auto_tenant_creation=True,
     # ),
+    # ================================================================================
+    # Uncomment this section to enable replication (if you are using a multi-node setup)
+    # ================================================================================
+    # replication_config=Configure.replication(factor=3)
 )
 
 assert client.collections.exists(CollectionName.SUPPORTCHAT)
