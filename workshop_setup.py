@@ -31,6 +31,9 @@ def setup(provider, dataset_size, use_cache):
     # Update configurations in both files
     update_configurations(provider)
 
+    # Delete existing collection if it exists
+    os.system("python 0_reset_cluster.py")
+
 
 def download_dataset(provider, dataset_size, use_cache):
     """Download the dataset for the specified provider."""

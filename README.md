@@ -73,7 +73,7 @@ You should see something like:
 ollama version is 0.3.8
 ```
 
-Then, run the following command:
+Run the following command to set up the workshop, and delete your existing collection data.
 
 ```shell
 python workshop_setup.py --provider ollama
@@ -96,6 +96,8 @@ While the download is progressing, you can continue to [the next section (1.3)](
 >     - We will use pre-embedded data for this workshop, so the expense will be for queries only & minimal
 >     - Still, please set a budget limit in your account for extra safety
 
+Run the following command to set up the workshop, and delete your existing collection data.
+
 ```shell
 python workshop_setup.py --provider cohere
 ```
@@ -116,6 +118,8 @@ While the download is progressing, you can continue to [the next section (1.3)](
 >     - Once you have a key, set it as an environment variable: `export OPENAI_API_KEY=your-key`
 >     - We will use pre-embedded data for this workshop, so the expense will be for queries only & minimal
 >     - Still, please set a budget limit in your account for extra safety
+
+Run the following command to set up the workshop, and delete your existing collection data.
 
 ```shell
 python workshop_setup.py --provider openai
