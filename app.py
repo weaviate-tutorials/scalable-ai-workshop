@@ -21,7 +21,7 @@ st.markdown(STREAMLIT_STYLING, unsafe_allow_html=True)
 
 with connect_to_weaviate() as client:
     st.markdown(
-        "<div class='stHeader'><h1>Gen AI: Prototyping to Production</h1><h4>🤖 SupportSage AI</h4></div>",
+        "<div class='stHeader'><h1>Gen AI: Prototyping to Production</h1><h4>🤖 SupportBuddy AI</h4></div>",
         unsafe_allow_html=True,
     )
 
