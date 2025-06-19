@@ -114,7 +114,7 @@ with connect_to_weaviate() as client:
             )
             st.info(body="Example source accounts: " + top_companies_str, icon="ℹ️")
 
-        with st.expander("Cluster statistics"):
+        with st.expander("Cluster statistics", expanded=True):
 
             with st.container(border=True):
                 @st.fragment(run_every=2)

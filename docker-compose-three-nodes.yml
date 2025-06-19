@@ -1,6 +1,6 @@
 ---
 services:
-  weaviate-node-1:  # Founding member service name
+  weaviate-0:
     command:
     - --host
     - 0.0.0.0
@@ -8,90 +8,100 @@ services:
     - '8080'
     - --scheme
     - http
+    - --write-timeout=600s
+    - --read-timeout=600s
     image: cr.weaviate.io/semitechnologies/weaviate:1.31.1
-    restart: on-failure:0
-    volumes:
-    - scalable_rag_workshop_node1:/var/lib/weaviate
     ports:
     - 8080:8080
     - 50051:50051
-    - 6060:6060
+    volumes:
+    - scalable_rag_workshop_node0:/var/lib/weaviate
+    restart: on-failure:0
     environment:
       QUERY_DEFAULTS_LIMIT: 25
-      QUERY_MAXIMUM_RESULTS: 10000
       AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
       PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
       DEFAULT_VECTORIZER_MODULE: 'none'
-      ASYNC_INDEXING: 'true'
-      ENABLE_MODULES: 'text2vec-ollama,generative-ollama'
+      MODULES_CLIENT_TIMEOUT: '600s'
       ENABLE_API_BASED_MODULES: 'true'
-      CLUSTER_HOSTNAME: 'node1'
-      CLUSTER_GOSSIP_BIND_PORT: '7100'
-      CLUSTER_DATA_BIND_PORT: '7101'
-      RAFT_JOIN: 'node1,node2,node3'
-      RAFT_BOOTSTRAP_EXPECT: 3
-  weaviate-node-2:
+      CLUSTER_HOSTNAME: "weaviate-0"
+      CLUSTER_GOSSIP_BIND_PORT: "7110"
+      CLUSTER_DATA_BIND_PORT: "7111"
+      RAFT_PORT: "8300"
+      RAFT_INTERNAL_RPC_PORT: "8301"
+      RAFT_BOOTSTRAP_EXPECT: "1"
+      RAFT_JOIN: "weaviate-0:8300,weaviate-1:8300,weaviate-2:8300"
+      PERSISTENCE_MEMTABLES_FLUSH_IDLE_AFTER_SECONDS: 1
+  weaviate-1:
+    init: true
     command:
-    - --host
-    - 0.0.0.0
-    - --port
-    - '8080'
-    - --scheme
-    - http
-    image: cr.weaviate.io/semitechnologies/weaviate:1.31.1
-    restart: on-failure:0
+      - --host
+      - 0.0.0.0
+      - --port
+      - '8080'
+      - --scheme
+      - http
+      - --write-timeout=600s
+      - --read-timeout=600s
+    image: semitechnologies/weaviate:1.31.1
     ports:
-    - 8081:8080
-    - 50152:50051
+      - 8081:8080
+      - 50052:50051
+    volumes:
+    - scalable_rag_workshop_node1:/var/lib/weaviate
+    restart: on-failure:0
+    environment:
+      LOG_LEVEL: 'debug'
+      QUERY_DEFAULTS_LIMIT: 20
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'none'
+      ENABLE_API_BASED_MODULES: 'true'
+      CLUSTER_HOSTNAME: "weaviate-1"
+      CLUSTER_GOSSIP_BIND_PORT: '7112'
+      CLUSTER_DATA_BIND_PORT: '7113'
+      CLUSTER_JOIN: 'weaviate-0:7110'
+      RAFT_PORT: "8300"
+      RAFT_INTERNAL_RPC_PORT: "8301"
+      RAFT_BOOTSTRAP_EXPECT: "1"
+      RAFT_JOIN: "weaviate-0:8300,weaviate-1:8300,weaviate-2:8300"
+      PERSISTENCE_MEMTABLES_FLUSH_IDLE_AFTER_SECONDS: 1
+  weaviate-2:
+    init: true
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - '8080'
+      - --scheme
+      - http
+      - --write-timeout=600s
+      - --read-timeout=600s
+    image: semitechnologies/weaviate:1.31.1
+    ports:
+      - 8082:8080
+      - 50053:50051
     volumes:
     - scalable_rag_workshop_node2:/var/lib/weaviate
-    environment:
-      QUERY_DEFAULTS_LIMIT: 25
-      QUERY_MAXIMUM_RESULTS: 10000
-      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
-      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
-      DEFAULT_VECTORIZER_MODULE: 'none'
-      ASYNC_INDEXING: 'true'
-      ENABLE_MODULES: 'text2vec-ollama,generative-ollama'
-      ENABLE_API_BASED_MODULES: 'true'
-      CLUSTER_HOSTNAME: 'node2'
-      CLUSTER_GOSSIP_BIND_PORT: '7102'
-      CLUSTER_DATA_BIND_PORT: '7103'
-      CLUSTER_JOIN: 'weaviate-node-1:7100'
-      RAFT_JOIN: 'node1,node2,node3'
-      RAFT_BOOTSTRAP_EXPECT: 3
-  weaviate-node-3:
-    command:
-    - --host
-    - 0.0.0.0
-    - --port
-    - '8080'
-    - --scheme
-    - http
-    image: cr.weaviate.io/semitechnologies/weaviate:1.31.1
     restart: on-failure:0
-    ports:
-    - 8082:8080
-    - 50153:50051
-    volumes:
-    - scalable_rag_workshop_node3:/var/lib/weaviate
     environment:
-      QUERY_DEFAULTS_LIMIT: 25
-      QUERY_MAXIMUM_RESULTS: 10000
+      LOG_LEVEL: 'debug'
+      QUERY_DEFAULTS_LIMIT: 20
       AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
       PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
       DEFAULT_VECTORIZER_MODULE: 'none'
-      ASYNC_INDEXING: 'true'
-      ENABLE_MODULES: 'text2vec-ollama,generative-ollama'
       ENABLE_API_BASED_MODULES: 'true'
-      CLUSTER_HOSTNAME: 'node3'
-      CLUSTER_GOSSIP_BIND_PORT: '7104'
-      CLUSTER_DATA_BIND_PORT: '7105'
-      CLUSTER_JOIN: 'weaviate-node-1:7100'
-      RAFT_JOIN: 'node1,node2,node3'
-      RAFT_BOOTSTRAP_EXPECT: 3
+      CLUSTER_HOSTNAME: "weaviate-2"
+      CLUSTER_GOSSIP_BIND_PORT: '7112'
+      CLUSTER_DATA_BIND_PORT: '7113'
+      CLUSTER_JOIN: 'weaviate-0:7110'
+      RAFT_PORT: "8300"
+      RAFT_INTERNAL_RPC_PORT: "8301"
+      RAFT_BOOTSTRAP_EXPECT: "1"
+      RAFT_JOIN: "weaviate-0:8300,weaviate-1:8300,weaviate-2:8300"
+      PERSISTENCE_MEMTABLES_FLUSH_IDLE_AFTER_SECONDS: 1
 volumes:
+  scalable_rag_workshop_node0:
   scalable_rag_workshop_node1:
   scalable_rag_workshop_node2:
-  scalable_rag_workshop_node3:
 ...

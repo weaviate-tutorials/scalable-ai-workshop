@@ -7,8 +7,8 @@ from tqdm import tqdm
 
 
 @click.command()
-@click.option("--provider", default="ollama", help="Which model provider to use.")
-@click.option("--dataset-size", default="50000", help="Size of the dataset to use.")
+@click.option("--provider", default="cohere", help="Which model provider to use.")
+@click.option("--dataset-size", default="100000", help="Size of the dataset to use.")
 @click.option("--use-cache", is_flag=True, default=True, help="Use cached files if available.")
 def setup(provider, dataset_size, use_cache):
     """Set up collection with the specified provider configuration."""

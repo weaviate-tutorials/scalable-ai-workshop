@@ -208,44 +208,9 @@ Now, go to [Step 3](#step-3-work-with-weaviate)
 
 ## 3.0 Choose your embedding & LLM provider
 
-The workshop is set up for three different embeddings & LLM providers options ([Ollama](#301-option-1-ollama), [Cohere](#302-option-2-cohere), or [OpenAI](#303-option-3-openai)).
+The workshop is set up to use Cohere by default. We provide helper CLI to download the data & prepare your project for you:
 
-We provide helper CLI to download the data & prepare your project for you:
-
-### 3.0.1 Option 1: Ollama
-
-> [!NOTE]
-> - Recommended if you have 16+ GB of RAM and a modern computer
-> - We will use pre-embedded data for this workshop, so Ollama will be used for vectorizing queries & LLM use
-> - No account or API key required
-
-Download & install Ollama from the [Ollama website](https://ollama.com/). Make sure Ollama is running, by:
-
-```shell
-ollama -v
-```
-
-You should see something like:
-```shell
-❯ ollama -v
-ollama version is 0.3.8
-```
-
-Run the following command to set up the workshop, and delete your existing collection data.
-
-```shell
-python workshop_setup.py --provider ollama
-```
-
-If you have already downloaded the data file, it will use a cached version. To overwrite the file, specify this flag::
-
-```shell
-python workshop_setup.py --provider ollama --use-cache False
-```
-
-When the download finishes, continue to the [next section](#31-run-the-demo-streamlit-app).
-
-### 3.0.2 Option 2: Cohere
+### 3.0.1 Default Option: Cohere
 
 > [!NOTE]
 > - Recommended if you want to use an API-based solution
@@ -268,46 +233,6 @@ python workshop_setup.py --provider cohere --use-cache False
 
 When the download finishes, continue to the [next section](#31-run-the-demo-streamlit-app).
 
-### 3.0.3 Option 3: OpenAI
-
-> [!NOTE]
-> - Recommended if you want to use an API-based solution
-> - OpenAI account & API key required
->     - Once you have a key, set it as an environment variable: `export OPENAI_API_KEY=your-key`
->     - We will use pre-embedded data for this workshop, so the expense will be for queries only & minimal
->     - Still, please set a budget limit in your account for extra safety
-
-Run the following command to set up the workshop, and delete your existing collection data.
-
-```shell
-python workshop_setup.py --provider openai
-```
-
-If you have already downloaded the data file, it will use a cached version. To overwrite the file, specify this flag::
-
-```shell
-python workshop_setup.py --provider openai --use-cache False
-```
-
-When the download finishes, continue to the [next section](#31-run-the-demo-streamlit-app).
-
-### 3.0.4 RECAP: Embedding & LLM provider
-
-You should have:
-- Selected your provider from `ollama`, `cohere` or `openai`.
-- Acquired a key if needed, and set it as an environment variable.
-- Run the associated command:
-
-```shell
-python workshop_setup.py --provider <YOUR_PROVIDER>
-```
-
-If the download is going to take *very* long (e.g. more than 10 minutes), maybe stop the download & use a smaller dataset. Do this by adding `--dataset-size 10000` to the end of your command, like:
-
-```shell
-python workshop_setup.py --provider <YOUR_PROVIDER> --dataset-size 10000
-```
-
 ## 3.1 Run the demo Streamlit app
 
 We have a Streamlit app that will help you to visualise basic cluster statistics, and to make use of the data. (Remember to navigate to the project directory and activate the virtual environment.) Run it with:
@@ -320,38 +245,7 @@ This will throw an error, but that's OK. We'll fix that in the next step.
 
 ## 3.2 Use Weaviate
 
-Now, let's load some data into Weaviate. You should now have these files:
-
-1_create_collection.py
-2_add_data_with_vectors.py
-
-Run the first script to create a collection:
-
-```shell
-python 1_create_collection.py
-```
-
-We will take a look together at the script.
-
-But if you would like, review it to see what it does. See what settings are being configured, and explore what options are available (or commented out - as alternatives).
-
-Now, refresh your streamlit app from the browser. The app should no longer throw an error.
-
-So let's run the second script to add data to the collection:
-
-```shell
-python 2_add_data_with_vectors.py
-```
-
-This should take just a few **seconds** to run. (We'll talk more about this, but that's because we're using pre-vectorized data.)
-
-You should see the memory profile of the Weaviate pod increase as the data is added.
-
-Now, refresh the Streamlit app. You should see the data in the app. Explore the app, and see what types of results you get for different search queries.
-
-# Step 3.3
-
-Here, we'll try things like change the index types, quantization schemes, and talk about multi-tenancy.
+Now, let's ingest data and play with Weaviate. You will follow through the `workshop.ipynb` notebook in the session. But you can also see `workshop_finished.ipynb` for a complete example.
 
 We don't want to spoil the whole workshop for you, so we'll leave it here for now. But - if you find yourself ahead of the group, you can try playing with the following sections and ideas:
 
